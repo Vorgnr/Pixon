@@ -1,0 +1,45 @@
+/* ./src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#app {
+  height: 100vh;
+}
+
+.toolbox-btn {
+  @apply p-2 font-semibold text-white inline-flex items-center space-x-2 rounded;
+}
+
+.toolbar {
+  @apply bg-indigo-500;
+  padding: 0 16px 0 66px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar {
+  @apply bg-gray-200;
+  height: 100%;
+  z-index: 1;
+  position: fixed;
+  overflow-y: scroll;
+  left: 0;
+  padding: 11px;
+  top: 0;
+}
+
+.main {
+  padding-left: 50px;
+  height: calc(100vh - 64px);
+  overflow: auto;
+  transition: .3s;
+}
+
+.swatch {
+  @apply cursor-pointer rounded-full shadow-md;
+  height: 15px;
+  width: 15px;
+  margin: 5px;
+}
