@@ -12,14 +12,13 @@ import ColorPicker from "@/components/ColorPicker.vue";
       @addRow="addRow"
       @delRow="delRow"
       @del="del"
+      @save="save"
+      @load="load"
       :size="row"
     />
   </header>
   <aside class="sidebar">
-    <color-picker
-      @select-color="selectColor"
-      :selected-color="color"
-    />
+    <color-picker @select-color="selectColor" :selected-color="color" />
   </aside>
   <main class="main" ref="grid">
     <grid
@@ -44,7 +43,7 @@ export default {
       gridHeight: 300,
       color: "#000",
       row: 64,
-      matrix: {}
+      matrix: {},
     };
   },
 
@@ -97,12 +96,59 @@ export default {
     },
 
     matrixChange(cell, color) {
-      this.matrix[cell] = color === false ? false : { color }
+      this.matrix[cell] = color === false ? false : { color };
     },
 
     del() {
       this.matrix = {};
-    }
+    },
+
+    getState() {
+      return {
+        matrix: this.matrix,
+        row: this.row,
+      };
+    },
+
+    setState(state) {
+      this.matrix = state.matrix;
+      this.row = state.row;
+    },
+
+    save() {
+      let body = document.body;
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(
+        new Blob([JSON.stringify(this.getState(), null, 2)], {
+          type: "application/json",
+        })
+      );
+      a.setAttribute("download", "draw");
+      body.appendChild(a);
+      a.click();
+      body.removeChild(a);
+    },
+
+    load() {
+      let body = document.body;
+      const input = document.createElement("input");
+      input.type = 'file'
+      input.onchange = () => {
+        console.log('change')
+        const reader = new FileReader();
+        reader.readAsDataURL(input.files[0]);
+        reader.onload = () => {
+          const dataURL = reader.result;
+          const json = atob(dataURL.substring(29));
+          const result = JSON.parse(json);
+          this.setState(result)
+        };
+      }
+
+      body.appendChild(input);
+      input.click();
+      body.removeChild(input);
+    },
   },
 };
 </script>
