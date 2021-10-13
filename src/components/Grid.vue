@@ -12,6 +12,7 @@
 
 <script>
 export default {
+  emits: ['matrixChange'],
   props: {
     width: {
       type: Number,
@@ -27,17 +28,16 @@ export default {
     },
     lineWidth: {
       type: Number,
-      default: 4,
     },
     mode: {
       type: String,
       default: "pen",
     },
+    matrix: Object
   },
 
   data() {
     return {
-      colorMatrix: {},
       isDrawing: false,
     };
   },
@@ -91,25 +91,25 @@ export default {
       const startX = x * this.cellLen + this.halfLineWidth;
       const startY = y * this.cellLen + this.halfLineWidth;
       if (color) {
-        this.colorMatrix[cell] = {
-          color
-        };
+        this.$emit('matrixChange', cell, color);
       }
-      this.ctx.fillStyle = this.colorMatrix[cell].color;
-      this.ctx.fillRect(startX, startY, this.drawLen, this.drawLen);
+      if (this.matrix[cell]) {
+        this.ctx.fillStyle = this.matrix[cell].color;
+        this.ctx.fillRect(startX, startY, this.drawLen, this.drawLen);
+      }
     },
 
     clearCell(cell) {
       const [x, y] = cell.split(":");
       const startX = x * this.cellLen + this.halfLineWidth;
       const startY = y * this.cellLen + this.halfLineWidth;
-      this.colorMatrix[cell] = false;
+      this.$emit('matrixChange', cell, false)
       this.ctx.clearRect(startX, startY, this.drawLen, this.drawLen);
     },
 
     drawCells() {
-      Object.keys(this.colorMatrix)
-        .filter((cell) => Boolean(this.colorMatrix[cell]))
+      Object.keys(this.matrix)
+        .filter((cell) => Boolean(this.matrix[cell]))
         .forEach((cell) => this.drawCell(cell));
     },
 

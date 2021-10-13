@@ -11,10 +11,15 @@ import ColorPicker from "@/components/ColorPicker.vue";
       @changeMode="changeMode"
       @addRow="addRow"
       @delRow="delRow"
+      @del="del"
+      :size="row"
     />
   </header>
   <aside class="sidebar">
-    <color-picker @select-color="selectColor" />
+    <color-picker
+      @select-color="selectColor"
+      :selected-color="color"
+    />
   </aside>
   <main class="main" ref="grid">
     <grid
@@ -22,7 +27,11 @@ import ColorPicker from "@/components/ColorPicker.vue";
       :height="this.gridHeight"
       :mode="mode"
       :color="color"
-      :size="row" />
+      :size="row"
+      :matrix="matrix"
+      @matrixChange="matrixChange"
+      :lineWidth="2"
+    />
   </main>
 </template>
 
@@ -33,8 +42,9 @@ export default {
       mode: "pen",
       gridWidth: 300,
       gridHeight: 300,
-      color: "#fff",
-      row: 8,
+      color: "#000",
+      row: 64,
+      matrix: {}
     };
   },
 
@@ -85,6 +95,14 @@ export default {
         this.row -= 1;
       }
     },
+
+    matrixChange(cell, color) {
+      this.matrix[cell] = color === false ? false : { color }
+    },
+
+    del() {
+      this.matrix = {};
+    }
   },
 };
 </script>

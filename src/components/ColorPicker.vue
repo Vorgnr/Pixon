@@ -1,16 +1,24 @@
 <template>
   <template v-for="swatch in swatches" :key="swatch">
-    <div
+    <button
       class="swatch"
+      :class="{ 'is-active': selectedColor === swatch, 'reverse': ['#fff', '#cbd5e0'].indexOf(swatch) > -1}"
       :style="{ backgroundColor: swatch }"
       @click="selectSwatch(swatch)"
-    ></div>
+    ></button>
   </template>
 </template>
 
 <script>
 export default {
   emits: ["selectColor"],
+
+  props: {
+    selectedColor: {
+      type: String,
+      default: '#fff'
+    }
+  },
 
   data() {
     return {
