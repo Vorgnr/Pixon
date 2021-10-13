@@ -4,7 +4,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx,.vue"
   },
   "dependencies": {
     "vue": "^3.2.20",
@@ -15,6 +16,8 @@
     "@vitejs/plugin-vue": "^1.9.3",
     "@vue/compiler-sfc": "^3.2.20",
     "autoprefixer": "^10.3.7",
+    "eslint": "^8.0.0",
+    "eslint-plugin-vue": "^7.19.1",
     "postcss": "^8.3.6",
     "tailwindcss": "^2.2.16",
     "vite": "^2.6.5"
