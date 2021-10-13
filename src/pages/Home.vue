@@ -22,8 +22,8 @@ import ColorPicker from "@/components/ColorPicker.vue";
   </aside>
   <main class="main" ref="grid">
     <grid
-      :width="this.gridWidth"
-      :height="this.gridHeight"
+      :width="gridWidth"
+      :height="gridHeight"
       :mode="mode"
       :color="color"
       :size="row"
