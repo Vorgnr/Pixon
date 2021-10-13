@@ -38,10 +38,23 @@
         />
       </svg>
     </button>
-    <button @click="addRow" class="bg-blue-500 toolbox-btn">+</button>
+    <button
+      class="bg-blue-500 toolbox-btn"
+      @click="addRow"
+    >
+      +
+    </button>
     {{ size }} x {{ size }}
-    <button @click="delRow" class="bg-blue-500 toolbox-btn">-</button>
-    <button class="bg-red-600 toolbox-btn" @click="del">
+    <button
+      class="bg-blue-500 toolbox-btn"
+      @click="delRow"
+    >
+      -
+    </button>
+    <button
+      class="bg-red-600 toolbox-btn"
+      @click="del"
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         class="h-6 w-6"
@@ -57,7 +70,10 @@
         />
       </svg>
     </button>
-    <button class="bg-green-400 toolbox-btn" @click="$emit('save')">
+    <button
+      class="bg-green-400 toolbox-btn"
+      @click="$emit('save')"
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         class="h-6 w-6"
@@ -73,7 +89,10 @@
         />
       </svg>
     </button>
-    <button class="bg-green-400 toolbox-btn" @click="$emit('load')">
+    <button
+      class="bg-green-400 toolbox-btn"
+      @click="$emit('load')"
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         class="h-6 w-6"
@@ -94,28 +113,31 @@
 
 <script>
 export default {
-  emits: ["addRow", "delRow", "changeMode", "del", "save", "load"],
   props: {
     mode: {
       type: String,
-      default: "pen",
+      default: 'pen',
     },
-    size: Number,
+    size: {
+      type: Number,
+      default: 64
+    }
   },
+  emits: ['addRow', 'delRow', 'changeMode', 'del', 'save', 'load'],
 
   methods: {
     addRow() {
-      this.$emit("addRow");
+      this.$emit('addRow');
     },
     delRow() {
-      this.$emit("delRow");
+      this.$emit('delRow');
     },
     del() {
-      this.$emit("del");
+      this.$emit('del');
     },
     changeMode(mode) {
       if (this.mode !== mode) {
-        this.$emit("changeMode", mode);
+        this.$emit('changeMode', mode);
       }
     },
   },

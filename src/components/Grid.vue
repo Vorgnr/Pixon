@@ -7,53 +7,49 @@
     @mousemove="mouseMove"
     @mouseleave="mouseLeave"
     @mouseup="mouseUp"
-  ></canvas>
+  />
 </template>
 
 <script>
 export default {
-  emits: ['matrixChange'],
   props: {
     width: {
       type: Number,
+      default: 100,
     },
     height: {
       type: Number,
+      default: 100,
     },
     size: {
       type: Number,
+      default: 64,
     },
     color: {
       type: String,
+      default: '#000'
     },
     lineWidth: {
       type: Number,
+      default: 2
     },
     mode: {
       type: String,
-      default: "pen",
+      default: 'pen',
     },
-    matrix: Object
+    matrix: {
+      type: Object,
+      default() {
+        return {}
+      }
+    }
   },
+  emits: ['matrixChange'],
 
   data() {
     return {
       isDrawing: false,
     };
-  },
-
-  mounted() {
-    const canva = document.getElementById("canva");
-    const ctx = canva.getContext("2d");
-    this.ctx = ctx;
-    this.ctx.lineWidth = this.lineWidth;
-    this.ctx.strokeStyle = "#4a5568";
-    this.ctx.shadowBlur = 0;
-    this.draw();
-  },
-
-  updated() {
-    this.draw();
   },
 
   computed: {
@@ -66,6 +62,20 @@ export default {
     halfLineWidth() {
       return this.lineWidth / 2;
     },
+  },
+
+  mounted() {
+    const canva = document.getElementById('canva');
+    const ctx = canva.getContext('2d');
+    this.ctx = ctx;
+    this.ctx.lineWidth = this.lineWidth;
+    this.ctx.strokeStyle = '#4a5568';
+    this.ctx.shadowBlur = 0;
+    this.draw();
+  },
+
+  updated() {
+    this.draw();
   },
 
   methods: {
@@ -87,7 +97,7 @@ export default {
     },
 
     drawCell(cell, color) {
-      const [x, y] = cell.split(":");
+      const [x, y] = cell.split(':');
       const startX = x * this.cellLen + this.halfLineWidth;
       const startY = y * this.cellLen + this.halfLineWidth;
       if (color) {
@@ -100,7 +110,7 @@ export default {
     },
 
     clearCell(cell) {
-      const [x, y] = cell.split(":");
+      const [x, y] = cell.split(':');
       const startX = x * this.cellLen + this.halfLineWidth;
       const startY = y * this.cellLen + this.halfLineWidth;
       this.$emit('matrixChange', cell, false)
@@ -138,7 +148,7 @@ export default {
     },
 
     getAction() {
-      if (this.mode === "rubber" || this.shiftKey) {
+      if (this.mode === 'rubber' || this.shiftKey) {
         return 'clearCell'
       }
 

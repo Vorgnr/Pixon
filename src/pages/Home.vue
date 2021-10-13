@@ -1,26 +1,32 @@
 <script setup>
-import Grid from "@/components/Grid.vue";
-import Toolbox from "@/components/Toolbox.vue";
-import ColorPicker from "@/components/ColorPicker.vue";
+import Grid from '@/components/Grid.vue';
+import Toolbox from '@/components/Toolbox.vue';
+import ColorPicker from '@/components/ColorPicker.vue';
 </script>
 
 <template>
   <header class="bg-indigo-400 toolbar">
     <toolbox
       :mode="mode"
+      :size="row"
       @changeMode="changeMode"
       @addRow="addRow"
       @delRow="delRow"
       @del="del"
       @save="save"
       @load="load"
-      :size="row"
     />
   </header>
   <aside class="sidebar">
-    <color-picker @select-color="selectColor" :selected-color="color" />
+    <color-picker
+      :selected-color="color"
+      @select-color="selectColor"
+    />
   </aside>
-  <main class="main" ref="grid">
+  <main
+    ref="grid"
+    class="main"
+  >
     <grid
       :width="gridWidth"
       :height="gridHeight"
@@ -28,8 +34,8 @@ import ColorPicker from "@/components/ColorPicker.vue";
       :color="color"
       :size="row"
       :matrix="matrix"
+      :line-width="2"
       @matrixChange="matrixChange"
-      :lineWidth="2"
     />
   </main>
 </template>
@@ -38,21 +44,21 @@ import ColorPicker from "@/components/ColorPicker.vue";
 export default {
   data() {
     return {
-      mode: "pen",
+      mode: 'pen',
       gridWidth: 300,
       gridHeight: 300,
-      color: "#000",
+      color: '#000',
       row: 64,
       matrix: {},
     };
   },
 
   created() {
-    window.addEventListener("resize", this.refreshGridDim);
+    window.addEventListener('resize', this.refreshGridDim);
   },
 
-  destroyed() {
-    window.removeEventListener("resize", this.refreshGridDim);
+  unmounted() {
+    window.removeEventListener('resize', this.refreshGridDim);
   },
 
   mounted() {
@@ -117,13 +123,13 @@ export default {
 
     save() {
       let body = document.body;
-      const a = document.createElement("a");
+      const a = document.createElement('a');
       a.href = URL.createObjectURL(
         new Blob([JSON.stringify(this.getState(), null, 2)], {
-          type: "application/json",
+          type: 'application/json',
         })
       );
-      a.setAttribute("download", "draw");
+      a.setAttribute('download', 'draw');
       body.appendChild(a);
       a.click();
       body.removeChild(a);
@@ -131,7 +137,7 @@ export default {
 
     load() {
       let body = document.body;
-      const input = document.createElement("input");
+      const input = document.createElement('input');
       input.type = 'file'
       input.onchange = () => {
         console.log('change')
