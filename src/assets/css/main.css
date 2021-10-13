@@ -11,6 +11,12 @@
   @apply p-2 font-semibold text-white inline-flex items-center space-x-2 rounded;
 }
 
+.toolbox-text {
+  @apply text-xl text-white;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+}
+
 .toolbar {
   @apply bg-indigo-500;
   padding: 0 16px 0 66px;

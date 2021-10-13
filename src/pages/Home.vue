@@ -140,7 +140,6 @@ export default {
       const input = document.createElement('input');
       input.type = 'file'
       input.onchange = () => {
-        console.log('change')
         const reader = new FileReader();
         reader.readAsDataURL(input.files[0]);
         reader.onload = () => {

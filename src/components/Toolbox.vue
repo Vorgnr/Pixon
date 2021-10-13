@@ -1,8 +1,7 @@
 <template>
   <div class="flex flex-wrap justify-center gap-2">
     <button
-      :class="mode === 'pen' ? 'bg-green-700' : 'hover:bg-green-600'"
-      class="bg-green-500 toolbox-btn"
+      class="toolbox-btn"
       @click="changeMode('pen')"
     >
       <svg
@@ -21,8 +20,7 @@
       </svg>
     </button>
     <button
-      :class="mode === 'rubber' ? 'bg-red-700' : 'hover:bg-red-600'"
-      class="bg-red-500 toolbox-btn"
+      class="toolbox-btn"
       @click="changeMode('rubber')"
     >
       <svg
@@ -39,21 +37,21 @@
       </svg>
     </button>
     <button
-      class="bg-blue-500 toolbox-btn"
-      @click="addRow"
+      class="toolbox-btn"
+      @click="$emit('addRow')"
     >
       +
     </button>
-    {{ size }} x {{ size }}
+    <span class="toolbox-text">{{ size }} x {{ size }}</span>
     <button
-      class="bg-blue-500 toolbox-btn"
-      @click="delRow"
+      class="toolbox-btn"
+      @click="$emit('delRow')"
     >
       -
     </button>
     <button
-      class="bg-red-600 toolbox-btn"
-      @click="del"
+      class="toolbox-btn"
+      @click="$emit('del')"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -71,7 +69,7 @@
       </svg>
     </button>
     <button
-      class="bg-green-400 toolbox-btn"
+      class="toolbox-btn"
       @click="$emit('save')"
     >
       <svg
@@ -90,7 +88,7 @@
       </svg>
     </button>
     <button
-      class="bg-green-400 toolbox-btn"
+      class="toolbox-btn"
       @click="$emit('load')"
     >
       <svg
@@ -105,6 +103,40 @@
           stroke-linejoin="round"
           stroke-width="2"
           d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+        />
+      </svg>
+    </button>
+    <button
+      class="toolbox-btn"
+      @click="$emit('undo')"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M7.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l2.293 2.293a1 1 0 010 1.414z"
+          clip-rule="evenodd"
+        />
+      </svg>
+    </button>
+    <button
+      class="toolbox-btn"
+      @click="$emit('redo')"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
+          clip-rule="evenodd"
         />
       </svg>
     </button>
@@ -123,18 +155,12 @@ export default {
       default: 64
     }
   },
-  emits: ['addRow', 'delRow', 'changeMode', 'del', 'save', 'load'],
+  emits: [
+    'addRow', 'delRow', 'changeMode', 
+    'del', 'save', 'load', 'undo', 'redo'
+    ],
 
   methods: {
-    addRow() {
-      this.$emit('addRow');
-    },
-    delRow() {
-      this.$emit('delRow');
-    },
-    del() {
-      this.$emit('del');
-    },
     changeMode(mode) {
       if (this.mode !== mode) {
         this.$emit('changeMode', mode);
