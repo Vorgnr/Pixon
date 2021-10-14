@@ -107,14 +107,22 @@ export default {
         this.ctx.fillStyle = this.matrix[cell].color;
         this.ctx.fillRect(startX, startY, this.drawLen, this.drawLen);
       }
+
+      if (this.matrix[cell] === false) {
+        this.ctx.clearRect(startX, startY, this.drawLen, this.drawLen);
+      }
     },
 
     clearCell(cell) {
-      const [x, y] = cell.split(':');
-      const startX = x * this.cellLen + this.halfLineWidth;
-      const startY = y * this.cellLen + this.halfLineWidth;
-      this.$emit('matrixChange', cell, false)
-      this.ctx.clearRect(startX, startY, this.drawLen, this.drawLen);
+      if (this.matrix[cell] !== false) {
+        this.$emit('matrixChange', cell, false)
+      }
+    },
+
+    fillCell(cell, color) {
+      if (!this.matrix[cell] || this.matrix[cell].color !== color) {
+        this.$emit('matrixChange', cell, color);
+      }
     },
 
     drawCells() {
@@ -152,7 +160,7 @@ export default {
         return 'clearCell'
       }
 
-      return 'drawCell'
+      return 'fillCell'
     },
 
     mouseEvent(event) {

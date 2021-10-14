@@ -11,6 +11,13 @@
   @apply p-2 font-semibold text-white inline-flex items-center space-x-2 rounded;
 }
 
+.toolbox-btn.disabled {
+  cursor: default;
+}
+.toolbox-btn.disabled svg {
+  fill: rgba(75, 85, 99, var(--tw-bg-opacity))
+}
+
 .toolbox-text {
   @apply text-xl text-white;
   padding-top: 0.5em;

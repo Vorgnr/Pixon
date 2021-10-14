@@ -2,6 +2,7 @@
 import Grid from '@/components/Grid.vue';
 import Toolbox from '@/components/Toolbox.vue';
 import ColorPicker from '@/components/ColorPicker.vue';
+
 </script>
 
 <template>
@@ -9,12 +10,16 @@ import ColorPicker from '@/components/ColorPicker.vue';
     <toolbox
       :mode="mode"
       :size="row"
+      :can-undo="canUndo"
+      :can-redo="canRedo"
       @changeMode="changeMode"
       @addRow="addRow"
       @delRow="delRow"
       @del="del"
       @save="save"
       @load="load"
+      @undo="undo"
+      @redo="redo"
     />
   </header>
   <aside class="sidebar">
@@ -41,6 +46,37 @@ import ColorPicker from '@/components/ColorPicker.vue';
 </template>
 
 <script>
+
+class SizedArray {
+  constructor(size) {
+    this.size = size;
+    this.array = [];
+    this.length = 0;
+  }
+
+  unshift(el) {
+    if (this.array.length === this.size) {
+      this.pop();
+    }
+
+    this.length += 1;
+
+    return this.array.unshift(el);
+  }
+
+  shift(el) {
+    if (this.length > 0) {
+      this.length -= 1;
+      return this.array.shift(el);
+    }
+  }
+
+  pop() {
+    this.length -= 1;
+    return this.array.pop();
+  }
+}
+
 export default {
   data() {
     return {
@@ -50,7 +86,18 @@ export default {
       color: '#000',
       row: 64,
       matrix: {},
+      previousState: new SizedArray(100),
+      nextState: new SizedArray(100),
     };
+  },
+
+  computed: {
+    canUndo() {
+      return this.previousState.length > 0;
+    },
+    canRedo() {
+      return this.nextState.length > 0;
+    },
   },
 
   created() {
@@ -102,21 +149,42 @@ export default {
     },
 
     matrixChange(cell, color) {
-      this.matrix[cell] = color === false ? false : { color };
+      this.setState({
+        matrix: {
+          ...this.matrix,
+          [cell]: color === false ? false : { color }
+        },
+        row: this.row
+      })
     },
 
     del() {
       this.matrix = {};
     },
 
+    undo() {
+      this.nextState.unshift(this.getState());
+      const ps = this.previousState.shift();
+      this.matrix = ps.matrix;
+      this.row = ps.row;
+    },
+
+    redo() {
+      this.previousState.unshift(this.getState());
+      const ns = this.nextState.shift();
+      this.matrix = ns.matrix;
+      this.row = ns.row;
+    },
+
     getState() {
       return {
-        matrix: this.matrix,
+        matrix: { ...this.matrix },
         row: this.row,
       };
     },
 
     setState(state) {
+      this.previousState.unshift(this.getState());
       this.matrix = state.matrix;
       this.row = state.row;
     },
@@ -138,7 +206,7 @@ export default {
     load() {
       let body = document.body;
       const input = document.createElement('input');
-      input.type = 'file'
+      input.type = 'file';
       input.onchange = () => {
         const reader = new FileReader();
         reader.readAsDataURL(input.files[0]);
@@ -146,9 +214,9 @@ export default {
           const dataURL = reader.result;
           const json = atob(dataURL.substring(29));
           const result = JSON.parse(json);
-          this.setState(result)
+          this.setState(result);
         };
-      }
+      };
 
       body.appendChild(input);
       input.click();

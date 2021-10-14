@@ -108,7 +108,8 @@
     </button>
     <button
       class="toolbox-btn"
-      @click="$emit('undo')"
+      :class="{ 'disabled' : !canUndo }"
+      @click=" canUndo && $emit('undo')"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -125,7 +126,8 @@
     </button>
     <button
       class="toolbox-btn"
-      @click="$emit('redo')"
+      :class="{ 'disabled' : !canRedo }"
+      @click="canRedo && $emit('redo')"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -153,6 +155,14 @@ export default {
     size: {
       type: Number,
       default: 64
+    },
+    canUndo: {
+      type: Boolean,
+      default: false,
+    },
+    canRedo: {
+      type: Boolean,
+      default: false,
     }
   },
   emits: [
