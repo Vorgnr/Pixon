@@ -8,6 +8,9 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx,.vue"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
+    "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "@fortawesome/vue-fontawesome": "^3.0.0-4",
     "vue": "^3.2.20",
     "vue-router": "^4.0.11",
     "vuex": "^4.0.2"

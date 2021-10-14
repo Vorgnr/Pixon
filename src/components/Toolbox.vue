@@ -1,152 +1,72 @@
 <template>
   <div class="flex flex-wrap justify-center gap-2">
     <button
-      class="toolbox-btn"
+      class="toolbox-btn hover:bg-indigo-600"
+      :class="{'bg-indigo-600': mode === 'pen'}"
       @click="changeMode('pen')"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-        />
-      </svg>
+      <font-awesome-icon
+        icon="pen"
+      />
     </button>
     <button
-      class="toolbox-btn"
+      class="toolbox-btn hover:bg-indigo-600"
+      :class="{'bg-indigo-600': mode === 'rubber'}"
       @click="changeMode('rubber')"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-5 w-5"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-      >
-        <path
-          fill-rule="evenodd"
-          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-          clip-rule="evenodd"
-        />
-      </svg>
+      <font-awesome-icon icon="eraser" />
     </button>
     <button
-      class="toolbox-btn"
+      class="toolbox-btn hover:bg-indigo-600"
+      :class="{'bg-indigo-600': mode === 'fill'}"
       @click="changeMode('fill')"
     >
-      <span class="toolbox-text">F</span>
+      <font-awesome-icon icon="fill" />
     </button>
     <button
-      class="toolbox-btn"
+      class="toolbox-btn hover:bg-indigo-600"
       @click="$emit('addRow')"
     >
-      +
+      <font-awesome-icon icon="plus-circle" />
     </button>
     <span class="toolbox-text">{{ size }} x {{ size }}</span>
     <button
-      class="toolbox-btn"
+      class="toolbox-btn hover:bg-indigo-600"
       @click="$emit('delRow')"
     >
-      -
+      <font-awesome-icon icon="minus-circle" />
     </button>
     <button
-      class="toolbox-btn"
+      class="toolbox-btn hover:bg-indigo-600"
       @click="$emit('del')"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-        />
-      </svg>
+      <font-awesome-icon icon="trash-alt" />
     </button>
     <button
-      class="toolbox-btn"
+      class="toolbox-btn hover:bg-indigo-600"
       @click="$emit('save')"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
-        />
-      </svg>
+      <font-awesome-icon icon="save" />
     </button>
     <button
-      class="toolbox-btn"
+      class="toolbox-btn hover:bg-indigo-600"
       @click="$emit('load')"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-        />
-      </svg>
+      <font-awesome-icon icon="folder-open" />
     </button>
     <button
       class="toolbox-btn"
-      :class="{ 'disabled' : !canUndo }"
+      :class="{ 'disabled' : !canUndo, 'hover:bg-indigo-600': canUndo }"
       @click=" canUndo && $emit('undo')"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-5 w-5"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-      >
-        <path
-          fill-rule="evenodd"
-          d="M7.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l2.293 2.293a1 1 0 010 1.414z"
-          clip-rule="evenodd"
-        />
-      </svg>
+      <font-awesome-icon icon="undo" />
     </button>
     <button
       class="toolbox-btn"
-      :class="{ 'disabled' : !canRedo }"
+      :class="{ 'disabled' : !canRedo, 'hover:bg-indigo-600': canRedo }"
       @click="canRedo && $emit('redo')"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-5 w-5"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-      >
-        <path
-          fill-rule="evenodd"
-          d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
-          clip-rule="evenodd"
-        />
-      </svg>
+      <font-awesome-icon icon="redo" />
     </button>
   </div>
 </template>

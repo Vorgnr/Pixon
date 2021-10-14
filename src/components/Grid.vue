@@ -178,7 +178,6 @@ export default {
             stack.unshift(west);
           }
         }
-        
       }
 
       this.$emit('matrixChange', matrix);
