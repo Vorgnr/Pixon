@@ -11,6 +11,14 @@
 </template>
 
 <script>
+const writeCord = (x, y) => `${x}:${y}`;
+const readCord = (cell) => {
+  const cord = cell.split(':');
+  const x = Number.parseInt(cord[0]);
+  const y = Number.parseInt(cord[1]);
+  return { x, y };
+};
+
 export default {
   props: {
     width: {
@@ -27,11 +35,11 @@ export default {
     },
     color: {
       type: String,
-      default: '#000'
+      default: '#000',
     },
     lineWidth: {
       type: Number,
-      default: 2
+      default: 2,
     },
     mode: {
       type: String,
@@ -40,11 +48,11 @@ export default {
     matrix: {
       type: Object,
       default() {
-        return {}
-      }
-    }
+        return {};
+      },
+    },
   },
-  emits: ['matrixChange'],
+  emits: ['cellChange', 'matrixChange'],
 
   data() {
     return {
@@ -90,19 +98,27 @@ export default {
       this.ctx.clearRect(0, 0, this.width, this.width);
       for (let index = 1; index < this.size; index++) {
         const y = index * this.cellLen;
-        this.drawLine(this.halfLineWidth, y, this.width - this.halfLineWidth, y);
-        this.drawLine(y, this.halfLineWidth, y, this.width - this.halfLineWidth);
+        this.drawLine(
+          this.halfLineWidth,
+          y,
+          this.width - this.halfLineWidth,
+          y
+        );
+        this.drawLine(
+          y,
+          this.halfLineWidth,
+          y,
+          this.width - this.halfLineWidth
+        );
       }
       this.drawCells();
     },
 
-    drawCell(cell, color) {
-      const [x, y] = cell.split(':');
+    drawCell(cell) {
+      const { x, y } = readCord(cell);
       const startX = x * this.cellLen + this.halfLineWidth;
       const startY = y * this.cellLen + this.halfLineWidth;
-      if (color) {
-        this.$emit('matrixChange', cell, color);
-      }
+      
       if (this.matrix[cell]) {
         this.ctx.fillStyle = this.matrix[cell].color;
         this.ctx.fillRect(startX, startY, this.drawLen, this.drawLen);
@@ -115,14 +131,57 @@ export default {
 
     clearCell(cell) {
       if (this.matrix[cell] !== false) {
-        this.$emit('matrixChange', cell, false)
+        this.$emit('cellChange', cell, false);
       }
     },
 
     fillCell(cell, color) {
       if (!this.matrix[cell] || this.matrix[cell].color !== color) {
-        this.$emit('matrixChange', cell, color);
+        this.$emit('cellChange', cell, color);
       }
+    },
+
+    fillZone(cell, color, m) {
+      let matrix = this.matrix || m;
+      if (matrix[cell]) {
+        return;
+      }
+      const stack = [cell]
+      let i = 0; 
+      // Limit loop with arbitrary number
+      while (stack.length > 0 && i < 15000) {
+        i++;
+        const c = stack.pop();
+        matrix[c] = { color }
+        const { x, y } = readCord(c);
+        if (x > 0) {
+          const nord = writeCord(x - 1, y);
+          if (!matrix[nord]) {
+            stack.unshift(nord);
+          }
+        }
+        if (x < this.size) {
+          const south = writeCord(x + 1, y);
+          if (!matrix[south]) {
+            stack.unshift(south);
+          }
+        }
+        if (y > 0) {
+          const east = writeCord(x, y - 1);
+          if (!matrix[east]) {
+            stack.unshift(east);
+          }
+        }
+        if (y < this.size) {
+          const west = writeCord(x, y + 1);
+          if (!matrix[west]) {
+            stack.unshift(west);
+          }
+        }
+        
+      }
+
+      this.$emit('matrixChange', matrix);
     },
 
     drawCells() {
@@ -137,7 +196,7 @@ export default {
       const canvasY = event.clientY - canvasRect.top;
       const row = Math.floor(canvasX / this.cellLen);
       const cell = Math.floor(canvasY / this.cellLen);
-      return `${row}:${cell}`;
+      return writeCord(row, cell);
     },
 
     mouseDown(event) {
@@ -157,10 +216,14 @@ export default {
 
     getAction() {
       if (this.mode === 'rubber' || this.shiftKey) {
-        return 'clearCell'
+        return 'clearCell';
       }
 
-      return 'fillCell'
+      if (this.mode === 'fill') {
+        return 'fillZone';
+      }
+
+      return 'fillCell';
     },
 
     mouseEvent(event) {

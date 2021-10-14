@@ -2,7 +2,6 @@
 import Grid from '@/components/Grid.vue';
 import Toolbox from '@/components/Toolbox.vue';
 import ColorPicker from '@/components/ColorPicker.vue';
-
 </script>
 
 <template>
@@ -40,13 +39,13 @@ import ColorPicker from '@/components/ColorPicker.vue';
       :size="row"
       :matrix="matrix"
       :line-width="2"
+      @cellChange="cellChange"
       @matrixChange="matrixChange"
     />
   </main>
 </template>
 
 <script>
-
 class SizedArray {
   constructor(size) {
     this.size = size;
@@ -148,14 +147,21 @@ export default {
       }
     },
 
-    matrixChange(cell, color) {
+    cellChange(cell, color) {
       this.setState({
         matrix: {
           ...this.matrix,
-          [cell]: color === false ? false : { color }
+          [cell]: color === false ? false : { color },
         },
-        row: this.row
-      })
+        row: this.row,
+      });
+    },
+
+    matrixChange(matrix) {
+      this.setState({
+        matrix: { ...matrix },
+        row: this.row,
+      });
     },
 
     del() {

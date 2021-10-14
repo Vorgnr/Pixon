@@ -38,6 +38,12 @@
     </button>
     <button
       class="toolbox-btn"
+      @click="changeMode('fill')"
+    >
+      <span class="toolbox-text">F</span>
+    </button>
+    <button
+      class="toolbox-btn"
       @click="$emit('addRow')"
     >
       +
@@ -165,10 +171,11 @@ export default {
       default: false,
     }
   },
+
   emits: [
     'addRow', 'delRow', 'changeMode', 
     'del', 'save', 'load', 'undo', 'redo'
-    ],
+  ],
 
   methods: {
     changeMode(mode) {
