@@ -39,9 +39,9 @@ class Drawer {
     }
   }
 
-  clear({ x = 0, y = 0, width }) {
+  clear({ x = 0, y = 0, width, height }) {
     if (width) {
-      this.ctx.clearRect(x, y, width, width);
+      this.ctx.clearRect(x, y, width, height);
     }
   }
 

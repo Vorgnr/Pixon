@@ -86,12 +86,12 @@ export default {
   data() {
     return {
       mode: 'pen',
-      gridMode: 'grid',
+      gridMode: 'dot',
       form: 'square',
       gridWidth: 300,
       gridHeight: 300,
       color: '#000',
-      row: 64,
+      row: 8,
       matrix: {},
       previousState: new SizedArray(100),
       nextState: new SizedArray(100),

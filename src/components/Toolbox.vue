@@ -128,7 +128,7 @@
         >
           <font-awesome-icon icon="plus-circle" />
         </button>
-        <span class="toolbox-text">{{ size }} x {{ size }}</span>
+        <span class="toolbox-text">{{ size }}</span>
         <button
           class="toolbox-btn hover:bg-indigo-600"
           @click="$emit('delRow')"

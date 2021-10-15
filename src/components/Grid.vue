@@ -17,6 +17,7 @@
 <script>
 import Drawer from '@/libs/Drawer'
 
+let tapedTwice = false;
 const writeCord = (x, y) => `${x}:${y}`;
 const readCord = (cell) => {
   const cord = cell.split(':');
@@ -108,18 +109,20 @@ export default {
       }
 
       if (this.gridMode === 'grid') {
-        const interation = this.size > this.heightSize
-         ? this.size : this.heightSize;
-        for (let index = 1; index < interation; index++) {
+        for (let index = 1; index < this.size; index++) {
+          const y = index * this.cellLen;
+          this.drawLine(y, this.halfLineWidth, y, this.height - this.halfLineWidth);
+        }
+
+        for (let index = 1; index < this.heightSize; index++) {
           const y = index * this.cellLen;
           this.drawLine(this.halfLineWidth, y, this.width - this.halfLineWidth, y );
-          this.drawLine(y, this.halfLineWidth, y, this.height - this.halfLineWidth);
         }
       }
 
       if (this.gridMode === 'dot') {
         for (let row = 1; row < this.size; row++) {
-          for (let col = 1; col < this.size; col++) {
+          for (let col = 1; col < this.heightSize; col++) {
             this.$d.drawDot({
               x: row * this.cellLen - this.cellLen * 0.5,
               y: col * this.cellLen - this.cellLen * 0.5,
@@ -133,7 +136,7 @@ export default {
     },
 
     draw() {
-      this.$d.clear({ width: this.width })
+      this.$d.clear({ width: this.width, height: this.height })
       this.drawGrid();
       this.drawCells();
     },
@@ -196,7 +199,7 @@ export default {
       }
 
       if (this.matrix[cell] === false) {
-        this.$d.clear({ x: startX, y: startY, width: this.drawLen })
+        this.$d.clear({ x: startX, y: startY, width: this.drawLen, height: this.drawLen })
       }
     },
 
@@ -269,6 +272,7 @@ export default {
     },
 
     mouseDown(event) {
+      console.log(event)
       this.isDrawing = true;
       this.button = event.button;
       this.shiftKey = event.shiftKey;
@@ -283,7 +287,13 @@ export default {
       this.isDrawing = false;
     },
 
-    touchStart() {
+    touchStart(event) {
+      if(!tapedTwice) {
+        tapedTwice = true;
+        setTimeout( function() { tapedTwice = false; }, 300 );
+        return false;
+      }
+      event.preventDefault();
       this.isDrawing = true;
     },
 
