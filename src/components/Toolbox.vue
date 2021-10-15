@@ -31,12 +31,33 @@
           :class="{ active: form === 'square' }"
           @click="changeForm('square')"
         >
-          <font-awesome-icon icon="square" />
+          <font-awesome-icon :icon="['fas', 'square-full']" />
+        </button>
+        <button
+          class="toolbox-btn hover:bg-indigo-600"
+          :class="{ active: form === 'square-rounded' }"
+          @click="changeForm('square-rounded')"
+        >
+          <font-awesome-icon :icon="['fas', 'square']" />
+        </button>
+        <button
+          class="toolbox-btn hover:bg-indigo-600"
+          :class="{ active: form === 'square-empty-rounded' }"
+          @click="changeForm('square-empty-rounded')"
+        >
+          <font-awesome-icon :icon="['far', 'square']" />
         </button>
         <button
           class="toolbox-btn hover:bg-indigo-600"
           :class="{ active: form === 'circle' }"
           @click="changeForm('circle')"
+        >
+          <font-awesome-icon icon="circle" />
+        </button>
+        <button
+          class="toolbox-btn hover:bg-indigo-600"
+          :class="{ active: form === 'circle-empty' }"
+          @click="changeForm('circle-empty')"
         >
           <font-awesome-icon icon="dot-circle" />
         </button>

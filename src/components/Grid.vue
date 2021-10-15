@@ -11,6 +11,8 @@
 </template>
 
 <script>
+import Drawer from '@/libs/Drawer'
+
 const writeCord = (x, y) => `${x}:${y}`;
 const readCord = (cell) => {
   const cord = cell.split(':');
@@ -77,8 +79,7 @@ export default {
   mounted() {
     const canva = document.getElementById('canva');
     const ctx = canva.getContext('2d');
-    this.ctx = ctx;
-    this.ctx.shadowBlur = 0;
+    this.$d = new Drawer(ctx, { shadowBlur: 0 });
     this.draw();
   },
 
@@ -88,21 +89,9 @@ export default {
 
   methods: {
     drawLine(x, x1, y, y2) {
-      this.ctx.beginPath();
-      this.ctx.moveTo(x, x1);
-      this.ctx.lineTo(y, y2);
-      this.ctx.lineWidth = this.lineWidth;
-      this.ctx.strokeStyle = '#cbd5e0';
-      this.ctx.stroke();
-    },
-
-    drawDot(x, y) {
-      const circleWidth = this.drawLen * 0.1;
-      this.ctx.beginPath();
-      this.ctx.lineWidth = this.lineWidth + 1;
-      this.ctx.strokeStyle = '#cbd5e0';
-      this.ctx.arc(x, y, circleWidth, 0, 2 * Math.PI);
-      this.ctx.stroke();
+      this.$d.drawLine({
+        x, x1, y, y2, lineWidth: this.lineWidth, strokeStyle:'#cbd5e0'
+      })
     },
 
     drawGrid() {
@@ -113,52 +102,79 @@ export default {
       if (this.gridMode === 'grid') {
         for (let index = 1; index < this.size; index++) {
           const y = index * this.cellLen;
-          this.drawLine(
-            this.halfLineWidth,
-            y,
-            this.width - this.halfLineWidth,
-            y
-          );
-          this.drawLine(
-            y,
-            this.halfLineWidth,
-            y,
-            this.width - this.halfLineWidth
-          );
+          const y2 = this.width - this.halfLineWidth
+          this.drawLine(this.halfLineWidth, y, y2, y );
+          this.drawLine(y, this.halfLineWidth, y, y2);
         }
       }
 
       if (this.gridMode === 'dot') {
         for (let row = 1; row < this.size; row++) {
           for (let col = 1; col < this.size; col++) {
-            this.drawDot(
-              ((row  * this.cellLen) - this.cellLen * .5),
-              ((col  * this.cellLen) - this.cellLen * .5)
-            )
+            this.$d.drawDot({
+              x: row * this.cellLen - this.cellLen * 0.5,
+              y: col * this.cellLen - this.cellLen * 0.5,
+              lineWidth: this.lineWidth + 1,
+              strokeStyle: '#cbd5e0',
+              circleWidth: this.drawLen * 0.1
+            })
           }
         }
       }
     },
 
     draw() {
-      this.ctx.clearRect(0, 0, this.width, this.width);
+      this.$d.clear({ width: this.width })
       this.drawGrid();
       this.drawCells();
     },
 
     drawForm({ cell, startX, startY }) {
       const { form, color } = this.matrix[cell];
-      if (form === 'square') {
-        this.ctx.fillStyle = color;
-        this.ctx.fillRect(startX, startY, this.drawLen, this.drawLen);
-      } else if (form === 'circle') {
-        const center = this.drawLen / 2;
+      const empty = form.indexOf('empty') > -1;
+
+      if (form.indexOf('square') === 0) {
+        let opts;
+        if (empty) {
+          const strokeLen = this.drawLen * 0.18;
+          opts = {
+            x: startX + strokeLen * 0.5,
+            y: startY + strokeLen * 0.5,
+            width: this.drawLen - strokeLen,
+            height: this.drawLen - strokeLen,
+            stroke: color,
+            lineWidth: this.drawLen * 0.18
+          }
+        } else {
+          opts = { fill: color } 
+        }
+        const radius = form.indexOf('rounded') > -1
+         ? 5 : 0
+        this.$d.drawRect({
+          x: startX,
+          y: startY,
+          width: this.drawLen,
+          height: this.drawLen,
+          radius,
+          ...opts,
+        })
+      } else if (form.indexOf('circle') === 0) {
         const circleWidth = this.drawLen * 0.38;
-        this.ctx.beginPath();
-        this.ctx.arc(startX + center, startY + center, center - circleWidth * 0.5, 0, 2 * Math.PI);
-        this.ctx.lineWidth = circleWidth;
-        this.ctx.strokeStyle = color;
-        this.ctx.stroke();
+        const center = this.drawLen / 2;
+        let opts = {
+          x: startX + center,
+          y: startY + center,
+        }
+        console.log('for', form)
+        if (empty) {
+          opts.lineWidth = circleWidth;
+          opts.strokeStyle = color;
+          opts.r = center - circleWidth * 0.5;
+        } else {
+          opts.fillStyle = color;
+          opts.r = this.drawLen * 0.5
+        }
+        this.$d.drawCircle(opts)
       }
     },
 
@@ -166,13 +182,13 @@ export default {
       const { x, y } = readCord(cell);
       const startX = x * this.cellLen + this.halfLineWidth;
       const startY = y * this.cellLen + this.halfLineWidth;
-      
+
       if (this.matrix[cell]) {
-        this.drawForm({ cell, startX, startY })
+        this.drawForm({ cell, startX, startY });
       }
 
       if (this.matrix[cell] === false) {
-        this.ctx.clearRect(startX, startY, this.drawLen, this.drawLen);
+        this.$d.clear({ x: startX, y: startY, width: this.drawLen })
       }
     },
 
@@ -191,14 +207,14 @@ export default {
       if (matrix[cell]) {
         return;
       }
-      const stack = [cell]
-      const cellToChange = []
-      let i = 0; 
+      const stack = [cell];
+      const cellToChange = [];
+      let i = 0;
       // Limit loop with arbitrary number
       while (stack.length > 0 && i < 15000) {
         i++;
         const c = stack.pop();
-        cellToChange.push(c)
+        cellToChange.push(c);
         const { x, y } = readCord(c);
         if (x > 0) {
           const nord = writeCord(x - 1, y);
@@ -236,7 +252,7 @@ export default {
     },
 
     getClickedCell(event) {
-      const canvasRect = this.ctx.canvas.getBoundingClientRect();
+      const canvasRect = this.$d.getClick();
       const canvasX = event.clientX - canvasRect.left;
       const canvasY = event.clientY - canvasRect.top;
       const row = Math.floor(canvasX / this.cellLen);
