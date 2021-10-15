@@ -8,10 +8,12 @@ import ColorPicker from '@/components/ColorPicker.vue';
   <header class="bg-indigo-400 toolbar">
     <toolbox
       :mode="mode"
+      :form="form"
       :size="row"
       :can-undo="canUndo"
       :can-redo="canRedo"
       @changeMode="changeMode"
+      @changeForm="changeForm"
       @addRow="addRow"
       @delRow="delRow"
       @del="del"
@@ -35,10 +37,11 @@ import ColorPicker from '@/components/ColorPicker.vue';
       :width="gridWidth"
       :height="gridHeight"
       :mode="mode"
+      :form="form"
       :color="color"
       :size="row"
       :matrix="matrix"
-      :line-width="2"
+      :line-width="1"
       @cellChange="cellChange"
       @matrixChange="matrixChange"
     />
@@ -80,6 +83,7 @@ export default {
   data() {
     return {
       mode: 'pen',
+      form: 'square',
       gridWidth: 300,
       gridHeight: 300,
       color: '#000',
@@ -94,6 +98,7 @@ export default {
     canUndo() {
       return this.previousState.length > 0;
     },
+
     canRedo() {
       return this.nextState.length > 0;
     },
@@ -121,7 +126,7 @@ export default {
     },
 
     getGridHeight() {
-      return this.$refs.grid.clientHeight - 15;
+      return this.$refs.grid.clientHeight;
     },
 
     refreshGridDim() {
@@ -131,6 +136,10 @@ export default {
 
     changeMode(mode) {
       this.mode = mode;
+    },
+
+    changeForm(form) {
+      this.form = form;
     },
 
     selectColor(color) {
@@ -147,19 +156,41 @@ export default {
       }
     },
 
-    cellChange(cell, color) {
+    cellChange(cell, clear) {
+      let newCell = this.matrix[cell];
+      let cellChanged = false;
+      if (clear) {
+        newCell = false;
+        cellChanged = true;
+      } else if (!newCell || newCell.color !== this.color || newCell.form !== this.form) {
+        cellChanged = true
+        newCell = { color: this.color, form: this.form }
+      }
+
+      if (cellChanged) {
+        this.setState({
+          matrix: {
+            ...this.matrix,
+            [cell]: newCell,
+          },
+          row: this.row,
+        });
+      }
+    },
+
+    matrixChange(changedCell) {
       this.setState({
         matrix: {
           ...this.matrix,
-          [cell]: color === false ? false : { color },
-        },
-        row: this.row,
-      });
-    },
+          ...changedCell.reduce((acc, c) => {
+            acc[c] =  {
+              color: this.color,
+              form: this.form,
+            }
 
-    matrixChange(matrix) {
-      this.setState({
-        matrix: { ...matrix },
+            return acc
+          }, {})
+        },
         row: this.row,
       });
     },

@@ -68,6 +68,20 @@
     >
       <font-awesome-icon icon="redo" />
     </button>
+    <button
+      class="toolbox-btn hover:bg-indigo-600"
+      :class="{'bg-indigo-600': form === 'square'}"
+      @click="changeForm('square')"
+    >
+      <font-awesome-icon icon="square" />
+    </button>
+    <button
+      class="toolbox-btn hover:bg-indigo-600"
+      :class="{'bg-indigo-600': form === 'circle'}"
+      @click="changeForm('circle')"
+    >
+      <font-awesome-icon icon="dot-circle" />
+    </button>
   </div>
 </template>
 
@@ -77,6 +91,10 @@ export default {
     mode: {
       type: String,
       default: 'pen',
+    },
+    form: {
+      type: String,
+      default: 'square',
     },
     size: {
       type: Number,
@@ -93,7 +111,7 @@ export default {
   },
 
   emits: [
-    'addRow', 'delRow', 'changeMode', 
+    'addRow', 'delRow', 'changeMode', 'changeForm',
     'del', 'save', 'load', 'undo', 'redo'
   ],
 
@@ -103,6 +121,12 @@ export default {
         this.$emit('changeMode', mode);
       }
     },
+
+    changeForm(form) {
+      if (this.form !== form) {
+        this.$emit('changeForm', form);
+      }
+    }
   },
 };
 </script>

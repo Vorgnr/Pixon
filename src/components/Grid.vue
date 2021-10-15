@@ -33,13 +33,9 @@ export default {
       type: Number,
       default: 64,
     },
-    color: {
-      type: String,
-      default: '#000',
-    },
     lineWidth: {
       type: Number,
-      default: 2,
+      default: 1,
     },
     mode: {
       type: String,
@@ -64,9 +60,11 @@ export default {
     cellLen() {
       return this.width / this.size;
     },
+
     drawLen() {
       return this.cellLen - this.lineWidth;
     },
+
     halfLineWidth() {
       return this.lineWidth / 2;
     },
@@ -76,8 +74,6 @@ export default {
     const canva = document.getElementById('canva');
     const ctx = canva.getContext('2d');
     this.ctx = ctx;
-    this.ctx.lineWidth = this.lineWidth;
-    this.ctx.strokeStyle = '#4a5568';
     this.ctx.shadowBlur = 0;
     this.draw();
   },
@@ -91,6 +87,8 @@ export default {
       this.ctx.beginPath();
       this.ctx.moveTo(x, x1);
       this.ctx.lineTo(y, y2);
+      this.ctx.lineWidth = this.lineWidth;
+      this.ctx.strokeStyle = '#cbd5e0';
       this.ctx.stroke();
     },
 
@@ -114,14 +112,29 @@ export default {
       this.drawCells();
     },
 
+    drawForm({ cell, startX, startY }) {
+      const { form, color } = this.matrix[cell];
+      if (form === 'square') {
+        this.ctx.fillStyle = color;
+        this.ctx.fillRect(startX, startY, this.drawLen, this.drawLen);
+      } else if (form === 'circle') {
+        const center = this.drawLen / 2;
+        const circleWidth = this.drawLen * 0.38;
+        this.ctx.beginPath();
+        this.ctx.arc(startX + center, startY + center, center - circleWidth * 0.5, 0, 2 * Math.PI);
+        this.ctx.lineWidth = circleWidth;
+        this.ctx.strokeStyle = color;
+        this.ctx.stroke();
+      }
+    },
+
     drawCell(cell) {
       const { x, y } = readCord(cell);
       const startX = x * this.cellLen + this.halfLineWidth;
       const startY = y * this.cellLen + this.halfLineWidth;
       
       if (this.matrix[cell]) {
-        this.ctx.fillStyle = this.matrix[cell].color;
-        this.ctx.fillRect(startX, startY, this.drawLen, this.drawLen);
+        this.drawForm({ cell, startX, startY })
       }
 
       if (this.matrix[cell] === false) {
@@ -131,14 +144,12 @@ export default {
 
     clearCell(cell) {
       if (this.matrix[cell] !== false) {
-        this.$emit('cellChange', cell, false);
+        this.$emit('cellChange', cell, true);
       }
     },
 
-    fillCell(cell, color) {
-      if (!this.matrix[cell] || this.matrix[cell].color !== color) {
-        this.$emit('cellChange', cell, color);
-      }
+    fillCell(cell) {
+      this.$emit('cellChange', cell);
     },
 
     fillZone(cell, color, m) {
@@ -147,12 +158,13 @@ export default {
         return;
       }
       const stack = [cell]
+      const cellToChange = []
       let i = 0; 
       // Limit loop with arbitrary number
       while (stack.length > 0 && i < 15000) {
         i++;
         const c = stack.pop();
-        matrix[c] = { color }
+        cellToChange.push(c)
         const { x, y } = readCord(c);
         if (x > 0) {
           const nord = writeCord(x - 1, y);
@@ -180,7 +192,7 @@ export default {
         }
       }
 
-      this.$emit('matrixChange', matrix);
+      this.$emit('matrixChange', cellToChange);
     },
 
     drawCells() {
@@ -227,7 +239,7 @@ export default {
 
     mouseEvent(event) {
       const clickedCell = this.getClickedCell(event);
-      this[this.getAction()](clickedCell, this.color);
+      this[this.getAction()](clickedCell);
     },
 
     mouseMove(event) {
