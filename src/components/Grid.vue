@@ -7,6 +7,10 @@
     @mousemove="mouseMove"
     @mouseleave="mouseLeave"
     @mouseup="mouseUp"
+    @touchstart="touchStart"
+    @touchend="touchEnd"
+    @touchleave="touchLeave"
+    @touchmove="touchMove"
   />
 </template>
 
@@ -67,6 +71,10 @@ export default {
       return this.width / this.size;
     },
 
+    heightSize() {
+      return this.height / this.cellLen;
+    },
+
     drawLen() {
       return this.cellLen - this.lineWidth;
     },
@@ -100,11 +108,12 @@ export default {
       }
 
       if (this.gridMode === 'grid') {
-        for (let index = 1; index < this.size; index++) {
+        const interation = this.size > this.heightSize
+         ? this.size : this.heightSize;
+        for (let index = 1; index < interation; index++) {
           const y = index * this.cellLen;
-          const y2 = this.width - this.halfLineWidth
-          this.drawLine(this.halfLineWidth, y, y2, y );
-          this.drawLine(y, this.halfLineWidth, y, y2);
+          this.drawLine(this.halfLineWidth, y, this.width - this.halfLineWidth, y );
+          this.drawLine(y, this.halfLineWidth, y, this.height - this.halfLineWidth);
         }
       }
 
@@ -165,7 +174,6 @@ export default {
           x: startX + center,
           y: startY + center,
         }
-        console.log('for', form)
         if (empty) {
           opts.lineWidth = circleWidth;
           opts.strokeStyle = color;
@@ -275,6 +283,27 @@ export default {
       this.isDrawing = false;
     },
 
+    touchStart() {
+      this.isDrawing = true;
+    },
+
+    touchEnd() {
+      this.isDrawing = false;
+    },
+
+    getTouchedCell(event) {
+      const canvasRect = this.$d.getClick();
+      const canvasX = event.targetTouches[0].clientX - canvasRect.left;
+      const canvasY = event.targetTouches[0].clientY - canvasRect.top;
+      const row = Math.floor(canvasX / this.cellLen);
+      const cell = Math.floor(canvasY / this.cellLen);
+      return writeCord(row, cell);
+    },
+
+    touchLeave() {
+      this.isDrawing = false;
+    },
+
     getAction() {
       if (this.mode === 'rubber' || this.shiftKey) {
         return 'clearCell';
@@ -290,6 +319,19 @@ export default {
     mouseEvent(event) {
       const clickedCell = this.getClickedCell(event);
       this[this.getAction()](clickedCell);
+    },
+
+    touchEvent(event) {
+      const touchedCell = this.getTouchedCell(event);
+      this[this.getAction()](touchedCell);
+    },
+
+    touchMove(event) {
+      if (!this.isDrawing) {
+        return;
+      }
+
+      this.touchEvent(event);
     },
 
     mouseMove(event) {
