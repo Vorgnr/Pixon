@@ -91,7 +91,7 @@ export default {
       gridWidth: 300,
       gridHeight: 300,
       color: '#000',
-      row: 8,
+      row: 64,
       matrix: {},
       previousState: new SizedArray(100),
       nextState: new SizedArray(100),

@@ -8,14 +8,16 @@
 }
 
 .toolbox-btn {
-  @apply p-2 font-semibold text-white inline-flex items-center space-x-2 rounded;
+  @apply p-2 text-gray-200 inline-flex items-center space-x-2 rounded;
 }
 
 .toolbox-btn.disabled {
+  @apply text-gray-400;
   cursor: default;
 }
-.toolbox-btn.disabled svg {
-  fill: rgba(75, 85, 99, var(--tw-bg-opacity))
+
+.toolbox-btn.active {
+  @apply bg-indigo-600 text-white
 }
 
 .toolbox-text {
@@ -26,10 +28,7 @@
 
 .toolbar {
   @apply bg-indigo-500;
-  padding: 0 16px 0 66px;
-  height: 54px;
-  display: flex;
-  align-items: center;
+  padding: 6px 16px 6px 66px;
 }
 
 .sidebar {
