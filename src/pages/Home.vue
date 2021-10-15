@@ -259,7 +259,20 @@ export default {
           const dataURL = reader.result;
           const json = atob(dataURL.substring(29));
           const result = JSON.parse(json);
-          this.setState(result);
+          const { matrix, row } = result;
+
+          this.setState({
+            row,
+            matrix: Object.keys(matrix).reduce((acc, k) => {
+              const form = matrix[k].form || 'square'
+              acc[k] = {
+                color: matrix[k].color,
+                form
+              }
+
+              return acc;
+            }, {})
+          });
         };
       };
 
