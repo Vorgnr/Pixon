@@ -8,12 +8,14 @@ import ColorPicker from '@/components/ColorPicker.vue';
   <header class="bg-indigo-400 toolbar">
     <toolbox
       :mode="mode"
+      :grid-mode="gridMode"
       :form="form"
       :size="row"
       :can-undo="canUndo"
       :can-redo="canRedo"
       @changeMode="changeMode"
       @changeForm="changeForm"
+      @changeGridMode="changeGridMode"
       @addRow="addRow"
       @delRow="delRow"
       @del="del"
@@ -37,6 +39,7 @@ import ColorPicker from '@/components/ColorPicker.vue';
       :width="gridWidth"
       :height="gridHeight"
       :mode="mode"
+      :grid-mode="gridMode"
       :form="form"
       :color="color"
       :size="row"
@@ -83,11 +86,12 @@ export default {
   data() {
     return {
       mode: 'pen',
+      gridMode: 'grid',
       form: 'square',
       gridWidth: 300,
       gridHeight: 300,
       color: '#000',
-      row: 64,
+      row: 8,
       matrix: {},
       previousState: new SizedArray(100),
       nextState: new SizedArray(100),
@@ -140,6 +144,10 @@ export default {
 
     changeForm(form) {
       this.form = form;
+    },
+
+    changeGridMode(gridMode) {
+      this.gridMode = gridMode;
     },
 
     selectColor(color) {

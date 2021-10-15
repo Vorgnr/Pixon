@@ -41,6 +41,10 @@ export default {
       type: String,
       default: 'pen',
     },
+    gridMode: {
+      type: String,
+      default: 'grid',
+    },
     matrix: {
       type: Object,
       default() {
@@ -92,23 +96,53 @@ export default {
       this.ctx.stroke();
     },
 
+    drawDot(x, y) {
+      const circleWidth = this.drawLen * 0.1;
+      this.ctx.beginPath();
+      this.ctx.lineWidth = this.lineWidth + 1;
+      this.ctx.strokeStyle = '#cbd5e0';
+      this.ctx.arc(x, y, circleWidth, 0, 2 * Math.PI);
+      this.ctx.stroke();
+    },
+
+    drawGrid() {
+      if (this.gridMode === 'none') {
+        return;
+      }
+
+      if (this.gridMode === 'grid') {
+        for (let index = 1; index < this.size; index++) {
+          const y = index * this.cellLen;
+          this.drawLine(
+            this.halfLineWidth,
+            y,
+            this.width - this.halfLineWidth,
+            y
+          );
+          this.drawLine(
+            y,
+            this.halfLineWidth,
+            y,
+            this.width - this.halfLineWidth
+          );
+        }
+      }
+
+      if (this.gridMode === 'dot') {
+        for (let row = 1; row < this.size; row++) {
+          for (let col = 1; col < this.size; col++) {
+            this.drawDot(
+              ((row  * this.cellLen) - this.cellLen * .5),
+              ((col  * this.cellLen) - this.cellLen * .5)
+            )
+          }
+        }
+      }
+    },
+
     draw() {
       this.ctx.clearRect(0, 0, this.width, this.width);
-      for (let index = 1; index < this.size; index++) {
-        const y = index * this.cellLen;
-        this.drawLine(
-          this.halfLineWidth,
-          y,
-          this.width - this.halfLineWidth,
-          y
-        );
-        this.drawLine(
-          y,
-          this.halfLineWidth,
-          y,
-          this.width - this.halfLineWidth
-        );
-      }
+      this.drawGrid();
       this.drawCells();
     },
 

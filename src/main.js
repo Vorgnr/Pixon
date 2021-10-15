@@ -3,13 +3,15 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import {
   faPen, faEraser, faFill, faTrashAlt,
   faPlusCircle, faMinusCircle, faUndo, faRedo,
-  faFolderOpen, faSave, faSquare, faDotCircle
+  faFolderOpen, faSave, faSquare, faDotCircle,
+  faBorderAll, faEllipsisV, faBorderNone
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add([
   faPen, faEraser, faFill, faTrashAlt, faPlusCircle, faMinusCircle,
-  faUndo, faRedo, faFolderOpen, faSave, faSquare, faDotCircle
+  faUndo, faRedo, faFolderOpen, faSave, faSquare, faDotCircle,
+  faBorderAll, faEllipsisV, faBorderNone
 ]);
 
 import App from '@/App.vue'

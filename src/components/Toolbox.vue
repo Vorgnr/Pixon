@@ -82,6 +82,27 @@
     >
       <font-awesome-icon icon="dot-circle" />
     </button>
+    <button
+      class="toolbox-btn hover:bg-indigo-600"
+      :class="{'bg-indigo-600': gridMode === 'grid'}"
+      @click="changeGridMode('grid')"
+    >
+      <font-awesome-icon icon="border-all" />
+    </button>
+    <button
+      class="toolbox-btn hover:bg-indigo-600"
+      :class="{'bg-indigo-600': gridMode === 'none'}"
+      @click="changeGridMode('none')"
+    >
+      <font-awesome-icon icon="border-none" />
+    </button>
+    <button
+      class="toolbox-btn hover:bg-indigo-600"
+      :class="{'bg-indigo-600': gridMode === 'dot'}"
+      @click="changeGridMode('dot')"
+    >
+      <font-awesome-icon icon="ellipsis-v" />
+    </button>
   </div>
 </template>
 
@@ -95,6 +116,10 @@ export default {
     form: {
       type: String,
       default: 'square',
+    },
+    gridMode: {
+      type: String,
+      default: 'grid',
     },
     size: {
       type: Number,
@@ -111,7 +136,7 @@ export default {
   },
 
   emits: [
-    'addRow', 'delRow', 'changeMode', 'changeForm',
+    'addRow', 'delRow', 'changeMode', 'changeForm', 'changeGridMode',
     'del', 'save', 'load', 'undo', 'redo'
   ],
 
@@ -125,6 +150,12 @@ export default {
     changeForm(form) {
       if (this.form !== form) {
         this.$emit('changeForm', form);
+      }
+    },
+
+    changeGridMode(gridMode) {
+      if (this.gridMode !== gridMode) {
+        this.$emit('changeGridMode', gridMode);
       }
     }
   },
