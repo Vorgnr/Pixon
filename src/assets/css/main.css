@@ -45,6 +45,7 @@
 }
 
 .main {
+  position: relative;
   padding-left: 47px;
   height: calc(100vh - 54px);
   overflow: auto;
@@ -69,4 +70,18 @@
 
 .swatch.is-active.reverse {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' stroke='%23000' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round' class='css-i6dzq1' viewBox='0 0 24 24'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");
+}
+
+#canva, #grid{
+  position:absolute;
+  top: 0px;
+  left: 47px;
+}
+
+#canva {
+  z-index: 1;
+}
+
+#grid {
+  z-index: 0;
 }

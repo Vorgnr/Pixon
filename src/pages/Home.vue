@@ -45,6 +45,7 @@ import ColorPicker from '@/components/ColorPicker.vue';
       :size="row"
       :matrix="matrix"
       :line-width="1"
+      :last-changed-cell="lastChangedCell"
       @cellChange="cellChange"
       @matrixChange="matrixChange"
     />
@@ -86,13 +87,14 @@ export default {
   data() {
     return {
       mode: 'pen',
-      gridMode: 'dot',
+      gridMode: 'grid',
       form: 'square',
-      gridWidth: 300,
-      gridHeight: 300,
+      gridWidth: 0,
+      gridHeight: 0,
       color: '#000',
-      row: 8,
+      row: 64,
       matrix: {},
+      lastChangedCell: null,
       previousState: new SizedArray(100),
       nextState: new SizedArray(100),
     };
@@ -177,6 +179,7 @@ export default {
 
       if (cellChanged) {
         this.setState({
+          lastChangedCell: cell,
           matrix: {
             ...this.matrix,
             [cell]: newCell,
@@ -187,15 +190,15 @@ export default {
     },
 
     matrixChange(changedCell) {
+      const newCell = {
+        color: this.color,
+        form: this.form,
+      };
       this.setState({
         matrix: {
           ...this.matrix,
           ...changedCell.reduce((acc, c) => {
-            acc[c] =  {
-              color: this.color,
-              form: this.form,
-            }
-
+            acc[c] = newCell;
             return acc
           }, {})
         },
@@ -204,12 +207,14 @@ export default {
     },
 
     del() {
+      this.lastChangedCell = null;
       this.matrix = {};
     },
 
     undo() {
       this.nextState.unshift(this.getState());
       const ps = this.previousState.shift();
+      this.lastChangedCell = null;
       this.matrix = ps.matrix;
       this.row = ps.row;
     },
@@ -217,18 +222,21 @@ export default {
     redo() {
       this.previousState.unshift(this.getState());
       const ns = this.nextState.shift();
+      this.lastChangedCell = null;
       this.matrix = ns.matrix;
       this.row = ns.row;
     },
 
     getState() {
       return {
+        lastChangedCell: null,
         matrix: { ...this.matrix },
         row: this.row,
       };
     },
 
     setState(state) {
+      this.lastChangedCell = state.lastChangedCell;
       this.previousState.unshift(this.getState());
       this.matrix = state.matrix;
       this.row = state.row;

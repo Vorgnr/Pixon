@@ -1,5 +1,10 @@
 <template>
   <canvas
+    id="grid"
+    :width="width"
+    :height="height"
+  />
+  <canvas
     id="canva"
     :width="width"
     :height="height"
@@ -15,7 +20,7 @@
 </template>
 
 <script>
-import Drawer from '@/libs/Drawer'
+import Drawer from '@/libs/Drawer';
 
 let tapedTwice = false;
 const writeCord = (x, y) => `${x}:${y}`;
@@ -58,12 +63,26 @@ export default {
         return {};
       },
     },
+    form: {
+      type: String,
+      default: 'square'
+    },
+    color: {
+      type: String,
+      default: '#000'
+    },
+    lastChangedCell: {
+      type: String,
+      default: null,
+    }
   },
+
   emits: ['cellChange', 'matrixChange'],
 
   data() {
     return {
       isDrawing: false,
+      gridDimUpdate: false,
     };
   },
 
@@ -85,25 +104,86 @@ export default {
     },
   },
 
-  mounted() {
-    const canva = document.getElementById('canva');
-    const ctx = canva.getContext('2d');
-    this.$d = new Drawer(ctx, { shadowBlur: 0 });
-    this.draw();
+  watch: {
+    height(current, previous) {
+      this.$nextTick(() => {
+        if (current !== previous && current > 0 && this.width > 0) {
+          this.draw();
+        }
+      })
+    },
+
+    width(current, previous) {
+      this.$nextTick(() => {
+        if (current !== previous && current > 0 && this.height > 0) {
+          this.draw();
+        }
+      })
+    },
+
+    lastChangedCell(current) {
+      if (current) {
+        this.drawCell(current);
+      }
+    },
+
+    matrix() {
+      if (!this.lastChangedCell) {
+        this.drawCells();
+      }
+    },
+
+    size() {
+      this.draw();
+    },
+
+    gridMode() {
+      this.drawGrid();
+    }
   },
 
-  updated() {
-    this.draw();
+  mounted() {
+    const canva = document.getElementById('canva');
+    const gridCanva = document.getElementById('grid');
+    const ctx = canva.getContext('2d');
+    const grid = gridCanva.getContext('2d');
+    this.$d = new Drawer(ctx, { shadowBlur: 0 });
+    this.$g = new Drawer(grid, { shadowBlur: 0 });
   },
 
   methods: {
     drawLine(x, x1, y, y2) {
-      this.$d.drawLine({
-        x, x1, y, y2, lineWidth: this.lineWidth, strokeStyle:'#cbd5e0'
-      })
+      this.$g.drawLine({
+        x,
+        x1,
+        y,
+        y2,
+        lineWidth: this.lineWidth,
+        strokeStyle: '#cbd5e0',
+      });
+    },
+
+    isGridUpToDate() {
+      return (
+        this.gridDimUpdate ===
+        `${this.width}x${this.height}x${this.size}x${this.gridMode}`
+        && !this.isDrawnOnce
+      );
+    },
+
+    setGridDimUpdate() {
+      this.isDrawnOnce = true;
+      this.gridDimUpdate = `${this.width}x${this.height}x${this.size}x${this.gridMode}`;
     },
 
     drawGrid() {
+      if (this.isGridUpToDate()) {
+        return;
+      } else {
+        this.$g.clear({ width: this.width, height: this.height });
+      }
+
+      this.setGridDimUpdate();
       if (this.gridMode === 'none') {
         return;
       }
@@ -111,34 +191,43 @@ export default {
       if (this.gridMode === 'grid') {
         for (let index = 1; index < this.size; index++) {
           const y = index * this.cellLen;
-          this.drawLine(y, this.halfLineWidth, y, this.height - this.halfLineWidth);
+          this.drawLine(
+            y,
+            this.halfLineWidth,
+            y,
+            this.height - this.halfLineWidth
+          );
         }
 
         for (let index = 1; index < this.heightSize; index++) {
           const y = index * this.cellLen;
-          this.drawLine(this.halfLineWidth, y, this.width - this.halfLineWidth, y );
+          this.drawLine(
+            this.halfLineWidth,
+            y,
+            this.width - this.halfLineWidth,
+            y
+          );
         }
       }
 
       if (this.gridMode === 'dot') {
         for (let row = 1; row < this.size; row++) {
           for (let col = 1; col < this.heightSize; col++) {
-            this.$d.drawDot({
+            this.$g.drawDot({
               x: row * this.cellLen - this.cellLen * 0.5,
               y: col * this.cellLen - this.cellLen * 0.5,
               lineWidth: this.lineWidth + 1,
               strokeStyle: '#cbd5e0',
-              circleWidth: this.drawLen * 0.1
-            })
+              circleWidth: this.drawLen * 0.1,
+            });
           }
         }
       }
     },
 
     draw() {
-      this.$d.clear({ width: this.width, height: this.height })
-      this.drawGrid();
       this.drawCells();
+      this.drawGrid();
     },
 
     drawForm({ cell, startX, startY }) {
@@ -155,13 +244,12 @@ export default {
             width: this.drawLen - strokeLen,
             height: this.drawLen - strokeLen,
             stroke: color,
-            lineWidth: this.drawLen * 0.18
-          }
+            lineWidth: this.drawLen * 0.18,
+          };
         } else {
-          opts = { fill: color } 
+          opts = { fill: color };
         }
-        const radius = form.indexOf('rounded') > -1
-         ? 5 : 0
+        const radius = form.indexOf('rounded') > -1 ? 5 : 0;
         this.$d.drawRect({
           x: startX,
           y: startY,
@@ -169,23 +257,23 @@ export default {
           height: this.drawLen,
           radius,
           ...opts,
-        })
+        });
       } else if (form.indexOf('circle') === 0) {
         const circleWidth = this.drawLen * 0.38;
         const center = this.drawLen / 2;
         let opts = {
           x: startX + center,
           y: startY + center,
-        }
+        };
         if (empty) {
           opts.lineWidth = circleWidth;
           opts.strokeStyle = color;
           opts.r = center - circleWidth * 0.5;
         } else {
           opts.fillStyle = color;
-          opts.r = this.drawLen * 0.5
+          opts.r = this.drawLen * 0.5;
         }
-        this.$d.drawCircle(opts)
+        this.$d.drawCircle(opts);
       }
     },
 
@@ -199,7 +287,12 @@ export default {
       }
 
       if (this.matrix[cell] === false) {
-        this.$d.clear({ x: startX, y: startY, width: this.drawLen, height: this.drawLen })
+        this.$d.clear({
+          x: startX,
+          y: startY,
+          width: this.drawLen,
+          height: this.drawLen,
+        });
       }
     },
 
@@ -257,6 +350,7 @@ export default {
     },
 
     drawCells() {
+      this.$d.clear({ width: this.width, height: this.height });
       Object.keys(this.matrix)
         .filter((cell) => Boolean(this.matrix[cell]))
         .forEach((cell) => this.drawCell(cell));
@@ -272,7 +366,6 @@ export default {
     },
 
     mouseDown(event) {
-      console.log(event)
       this.isDrawing = true;
       this.button = event.button;
       this.shiftKey = event.shiftKey;
@@ -288,9 +381,11 @@ export default {
     },
 
     touchStart(event) {
-      if(!tapedTwice) {
+      if (!tapedTwice) {
         tapedTwice = true;
-        setTimeout( function() { tapedTwice = false; }, 300 );
+        setTimeout(function () {
+          tapedTwice = false;
+        }, 300);
         return false;
       }
       event.preventDefault();
