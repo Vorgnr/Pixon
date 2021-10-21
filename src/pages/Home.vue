@@ -236,7 +236,7 @@ export default {
     },
 
     setState(state) {
-      this.lastChangedCell = state.lastChangedCell;
+      this.lastChangedCell = new String(state.lastChangedCell);
       this.previousState.unshift(this.getState());
       this.matrix = state.matrix;
       this.row = state.row;

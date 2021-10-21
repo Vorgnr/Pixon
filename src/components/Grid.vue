@@ -122,9 +122,11 @@ export default {
     },
 
     lastChangedCell(current) {
-      if (current) {
-        this.drawCell(current);
-      }
+      this.$nextTick(() => {
+        if (current) {
+          this.drawCell(current);
+        }
+      })
     },
 
     matrix() {
