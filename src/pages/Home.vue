@@ -203,6 +203,7 @@ export default {
           }, {})
         },
         row: this.row,
+        lastChangedCell: null,
       });
     },
 
@@ -236,7 +237,7 @@ export default {
     },
 
     setState(state) {
-      this.lastChangedCell = new String(state.lastChangedCell);
+      this.lastChangedCell = state.lastChangedCell && new String(state.lastChangedCell);
       this.previousState.unshift(this.getState());
       this.matrix = state.matrix;
       this.row = state.row;
